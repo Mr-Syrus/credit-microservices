@@ -1,0 +1,21 @@
+package com.mr_syrus.credit.api.entity;
+
+public enum WorkStatus {
+    FULL_TIME_EMPLOYED,
+    PART_TIME_EMPLOYED,
+    SELF_EMPLOYED,
+    FREE_LANCER,
+    CONTRACT_WORKER,
+    TEMPORARY,
+    INTERN,
+    UNEMPLOYED,
+    STUDENT,
+    RETIRED,
+    HOMEMAKER,
+    ON_MATERNITY_LEAVE,
+    DISABLED,
+    SEEKING_WORK,
+    NOT_SEEKING_WORK,
+    MILITARY_SERVICE,
+    OTHER
+}
