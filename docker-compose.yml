@@ -1,0 +1,33 @@
+version: '3.8' #версия синтаксиса docker
+
+services: #эта секция описывает все контейнеры, которые будут запущены
+
+  kafka:
+    image: confluentinc/cp-kafka:latest #образ который будет скачан, :latest означает самую свежую версию на момент запуска
+    container_name: kafka #имя контейнера (будет видно в 'docker ps')
+    environment: #переменные окружения
+      KAFKA_BROKER_ID: 1 #уникальный ID брокера в кластере
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093 #кворум контроллер, а адрес для внутреннего общения
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093 #слушатели: PLAINTEXT на порту 9092 для клиентов, CONTROLLER на порту 9093 для внутренних нужд
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092 #адрес который рекламируется клиентам
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT #соответствие протоколов слушателям
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER #имя слушателя для контроллера
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT #слушатель для обмена между брокерами (здесь тот же, что и для клиентов)
+      KAFKA_LOG_DIRS: /var/lib/kafka/data #каталог для данных (можно смонтировать volume)
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 #фактор репликации для внутреннего топика offsets
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks: #подключение к обзей сети которая определена ниже
+      - kafka-net
+
+networks:
+  #имя сети, используется в сервисах
+  kafka-net:
+    driver: bridge #драйвер network'a: bridge - стандартный мост для одного хоста
+
+#этот кусок определяет именованный том для хранения данных Kafka
+volumes:
+  kafka-data:
+
+
