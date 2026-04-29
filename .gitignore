@@ -1,3 +1,4 @@
+### Develop local file ###
 .gradle
 build/
 **/build/
@@ -37,3 +38,7 @@ bin/
 *-local.yml
 *-dev.yml
 .env
+.venv
+
+### Model binaries ###
+*.pkl

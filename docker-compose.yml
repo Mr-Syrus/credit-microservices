@@ -5,6 +5,8 @@ services: #эта секция описывает все контейнеры, �
   kafka:
     image: confluentinc/cp-kafka:latest #образ который будет скачан, :latest означает самую свежую версию на момент запуска
     container_name: kafka #имя контейнера (будет видно в 'docker ps')
+    ports:
+      - "9092:9092"
     environment: #переменные окружения
       KAFKA_BROKER_ID: 1 #уникальный ID брокера в кластере
       KAFKA_PROCESS_ROLES: broker,controller
