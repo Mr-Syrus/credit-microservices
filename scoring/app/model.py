@@ -2,16 +2,14 @@ import pickle
 import numpy as np
 import os
 
-# Пути к файлам (лежат в корневой папке python-scoring)
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "model.pkl")
 SCALER_PATH = os.path.join(os.path.dirname(__file__), "..", "scaler.pkl")
 
-# Глобальные переменные для модели и scaler
 _model = None
 _scaler = None
 
 def load_model():
-    """Загружает модель и scaler один раз при старте сервиса"""
+    #загружает модель и scaler один раз при старте сервиса
     global _model, _scaler
     if _model is None:
         with open(MODEL_PATH, "rb") as f:
@@ -22,15 +20,12 @@ def load_model():
     return _model, _scaler
 
 def predict(features: list) -> float:
-    """
-    Принимает список [age, income, loan_amount, credit_history]
-    Возвращает вероятность дефолта (0..1)
-    """
+    #принимает список [age, income, loan_amount, credit_history]
     model, scaler = load_model()
     # Преобразуем в numpy массив и масштабируем
     X = np.array(features).reshape(1, -1)
     X_scaled = scaler.transform(X)
-    prob = model.predict_proba(X_scaled)[0, 1]   # вероятность класса "дефолт" (1)
+    prob = model.predict_proba(X_scaled)[0, 1]   # вероятность класса "дефолт"
     return float(prob)
 
 # Для демонстрации: если файлов model.pkl/scaler.pkl нет,

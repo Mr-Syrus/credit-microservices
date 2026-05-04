@@ -13,20 +13,22 @@ np.random.seed(42)
 
 n_samples = 10000
 
-# признаки
+# признаки, генерация данных
 age = np.random.randint(18, 70, n_samples) # возраст
 income = np.random.randint(300, 3000, n_samples) # доход в тыс. руб
 loan_amount = np.random.randint(50, 500, n_samples) # сумма кредита в тыс. руб
-credit_history = np.random.randint(0, 6, n_samples) # количество просрочек в прошлом
+credit_term_months = np.random.randint(6, 60, n_samples) # срок кредита в месяцах
+marital_status = np.random.choice([0, 1], n_samples, p=[0.4, 0.6]) # состоит в браке
 
-X = np.column_stack((age, income, loan_amount, credit_history))
+X = np.column_stack((age, income, loan_amount, marital_status))
 
 # целевая переменная y (дефолт = 1, возврат = 0)
 # формируем логику дефолта, вероятность дефолта вычисляется как сигмоида от линейной комбинации
 linear = (-0.03 * age
           - 0.0005 * income
           + 0.02 * loan_amount
-          + 0.6 * credit_history
+          - 0.6 * marital_status
+          + 0.01 * credit_term_months
           + 0.5) # свободный член (intercept)
 
 # применяем сигмоиду, чтобы получить вероятность дефолта

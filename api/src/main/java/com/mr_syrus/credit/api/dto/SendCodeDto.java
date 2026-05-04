@@ -5,10 +5,35 @@ public class SendCodeDto {
     private String passportNumber;
     private String mail;
 
-    public String getPassportSeries() { return passportSeries; }
-    public void setPassportSeries(String passportSeries) { this.passportSeries = passportSeries; }
-    public String getPassportNumber() { return passportNumber; }
-    public void setPassportNumber(String passportNumber) { this.passportNumber = passportNumber; }
-    public String getMail() { return mail; }
-    public void setMail(String mail) { this.mail = mail; }
+    public SendCodeDto() {}
+
+    public SendCodeDto(String passportSeries, String passportNumber, String mail) {
+        this.passportSeries = passportSeries;
+        this.passportNumber = passportNumber;
+        this.mail = mail;
+    }
+
+    public String getPassportSeries() {
+        return passportSeries;
+    }
+
+    public void setPassportSeries(String passportSeries) {
+        this.passportSeries = passportSeries;
+    }
+
+    public String getPassportNumber() {
+        return passportNumber;
+    }
+
+    public void setPassportNumber(String passportNumber) {
+        this.passportNumber = passportNumber;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
 }

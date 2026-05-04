@@ -4,6 +4,7 @@ import com.mr_syrus.credit.api.dto.CodeVerificationDto;
 import com.mr_syrus.credit.api.dto.CreateApplicationDto;
 import com.mr_syrus.credit.api.dto.RegistrationClientDto;
 import com.mr_syrus.credit.api.entity.UserEntity;
+import com.mr_syrus.credit.api.service.ApplicationService;
 import com.mr_syrus.credit.api.service.ClientService;
 import com.mr_syrus.credit.api.service.SessionService;
 import jakarta.servlet.http.Cookie;
@@ -17,11 +18,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/client")
 public class ClientController {
-
+    private final ApplicationService applicationService;
     private final ClientService clientService;
     private final SessionService sessionService;
 
-    public ClientController(ClientService clientService, SessionService sessionService) {
+    public ClientController(ApplicationService applicationService, ClientService clientService, SessionService sessionService) {
+        this.applicationService = applicationService;
 
         this.clientService = clientService;
         this.sessionService = sessionService;
@@ -44,7 +46,7 @@ public class ClientController {
                                                   HttpServletRequest request) {
         String sessionKey = extractSessionKey(request);
         UserEntity currentUser = sessionService.getUserBySessionKey(sessionKey);
-        Integer applicationId = clientService.createApplication(dto, currentUser);
+        Integer applicationId = applicationService.createApplication(dto, currentUser);
         return ResponseEntity.ok(applicationId);
     }
 

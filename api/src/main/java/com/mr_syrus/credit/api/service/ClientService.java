@@ -3,6 +3,7 @@ package com.mr_syrus.credit.api.service;
 import com.mr_syrus.credit.api.dto.CodeVerificationDto;
 import com.mr_syrus.credit.api.dto.CreateApplicationDto;
 import com.mr_syrus.credit.api.dto.RegistrationClientDto;
+import com.mr_syrus.credit.api.dto.ScoringEventDto;
 import com.mr_syrus.credit.api.entity.*;
 import com.mr_syrus.credit.api.repository.*;
 import jakarta.transaction.Transactional;
@@ -12,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.UUID;
 
 @Service
@@ -77,6 +79,7 @@ public class ClientService {
         PersonalDataEntity personalData = new PersonalDataEntity(
                 user,
                 RosfinmonitoringStatus.NOT_RESTRICTED,
+                dto.getMaritalStatus(),
                 dto.getPassportSeries(),
                 dto.getPassportNumber(),
                 dto.getPassportIssuedBy(),
@@ -152,54 +155,4 @@ public class ClientService {
 
         codeRepository.delete(authCode);
     }
-
-    @Transactional
-    public Integer createApplication(CreateApplicationDto dto, UserEntity currentUser) {
-        // 1. Получить персональные данные пользователя
-        PersonalDataEntity personalData = personalDataRepository.findByUser(currentUser)
-                .orElseThrow(() -> new IllegalStateException("Personal data not found"));
-
-        // 2. Проверить соответствие верификационных данных
-        if (!normalize(personalData.getPassportSeries()).equals(normalize(dto.getPassportSeries())) ||
-                !normalize(personalData.getPassportNumber()).equals(normalize(dto.getPassportNumber())) ||
-                !normalize(personalData.getInn()).equals(normalize(dto.getInn())) ||
-                !normalize(personalData.getSnils()).equals(normalize(dto.getSnils())) ||
-                !personalData.getBirthDate().equals(dto.getBirthDate())) {
-            throw new IllegalArgumentException("Verification data does not match stored personal data");
-        }
-
-        // 2.1 Проверка по спискам Росфинмониторинга (заглушка)
-        // В реальном проекте здесь должен быть вызов внешнего API Росфинмониторинга
-        // Передать паспортные данные, ИНН, СНИЛС, ФИО
-        // Если API вернёт статус "IN_LIST_FULL_BLOCK" - выбросить исключение
-        // Пока просто запрос к заранее заданному полю
-        if (personalData.getRosfinmonitoringStatus() != RosfinmonitoringStatus.NOT_RESTRICTED) {
-            throw new IllegalArgumentException("Client is blacklisted by Rosfinmonitoring");
-        }
-
-        // 2.2 Проверка кредитного продукта
-        CreditEntity credit = creditRepository.findById(dto.getCreditId())
-                .orElseThrow(() -> new IllegalArgumentException("Credit product not found"));
-
-        // 2.3 Проверка допустимости суммы и срока
-        if (dto.getCreditAmount().compareTo(credit.getMinAmount()) < 0 ||
-                dto.getCreditAmount().compareTo(credit.getMaxAmount()) > 0) {
-            throw new IllegalArgumentException("Credit amount out of allowed range");
-        }
-        if (dto.getCreditTerm() < credit.getMinTermMonths() ||
-                dto.getCreditTerm() > credit.getMaxTermMonths()) {
-            throw new IllegalArgumentException("Credit term out of allowed range");
-        }
-
-        // 2.4 Создать заявку
-        ApplicationEntity application = new ApplicationEntity(personalData, credit, dto.getCreditTerm(), dto.getCreditAmount());
-        application = applicationRepository.save(application);
-
-        return application.getId();
-    }
-
-    private String normalize(String value) {
-        return value == null ? null : value.replaceAll("[-\\s]", "");
-    }
-
 }

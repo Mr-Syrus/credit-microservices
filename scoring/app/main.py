@@ -1,10 +1,8 @@
-"""
-Микросервис кредитного скоринга на FastAPI + Kafka.
-Коммуникация с Java-микросервисом:
-- Java отправляет сообщения в Kafka topic "credit.requests"
-- Python читает, вычисляет вероятность дефолта, отправляет ответ в "credit.responses"
-- Дополнительно: REST endpoint /score для синхронных запросов (удобно для тестов)
-"""
+
+# Микросервис кредитного скоринга на FastAPI + Kafka.
+# Коммуникация с Java-микросервисом:
+# - Java отправляет сообщения в Kafka topic "credit.requests"
+# - Python читает, вычисляет вероятность дефолта, отправляет ответ в "credit.responses"
 
 import asyncio
 import json
@@ -14,7 +12,7 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from .schemas import ScoreRequest, ScoreResponse
 from .model import predict
 
-# === Конфигурация Kafka (переопределяется через env) ===
+# Конфигурация Kafka
 import os
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "localhost:9092")
 REQUEST_TOPIC = "credit.requests"
@@ -25,7 +23,7 @@ GROUP_ID = "python-scoring-group"
 consumer = None
 producer = None
 
-# === Lifespan для FastAPI: старт/стоп Kafka компонентов ===
+# старт/стоп Kafka компонентов
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global consumer, producer
@@ -53,7 +51,7 @@ async def lifespan(app: FastAPI):
     await producer.stop()
     print("Kafka connections closed")
 
-# === Фоновая задача: читает запросы из Kafka, вызывает predict, отправляет ответ ===
+# читает запросы из Kafka, вызывает predict
 async def kafka_loop():
     print("Kafka consumer loop started, waiting for messages...")
     try:
@@ -84,7 +82,7 @@ async def kafka_loop():
     except Exception as e:
         print(f"Kafka loop error: {e}")
 
-# === FastAPI приложение ===
+# FastAPI приложение
 app = FastAPI(
     title="Credit Scoring Microservice",
     description="Predicts default probability using logistic regression. "
@@ -96,15 +94,11 @@ app = FastAPI(
 
 @app.get("/health")
 async def health_check():
-    """Проверка жизнеспособности сервиса"""
     return {"status": "alive", "kafka_connected": consumer is not None and not consumer._closed}
 
 @app.post("/score", response_model=ScoreResponse)
 async def score_sync(request: ScoreRequest):
-    """
-    Синхронный REST endpoint для скоринга (без Kafka).
-    Полезен для отладки и интеграций, не требующих асинхронности.
-    """
+    #эндпоинт для тестов
     try:
         prob = predict([request.age, request.income, request.loan_amount, request.credit_history])
         decision = "approve" if prob < 0.5 else "reject"
@@ -116,8 +110,6 @@ async def score_sync(request: ScoreRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# === Точка входа при запуске скрипта ===
 if __name__ == "__main__":
     import uvicorn
-    # Для локального запуска (без Docker):
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)

@@ -22,6 +22,9 @@ public class PersonalDataEntity {
     @Column(name = "rosfinmonitoring_status", nullable = false)
     private RosfinmonitoringStatus rosfinmonitoringStatus = RosfinmonitoringStatus.NOT_RESTRICTED;
 
+    @Column(name = "marital_status", nullable = false)
+    private Boolean maritalStatus;
+
     // паспортные данные
     @Column(name = "passport_series", nullable = false, length = 4)
     private String passportSeries;
@@ -70,6 +73,7 @@ public class PersonalDataEntity {
     public PersonalDataEntity(
             UserEntity user,
             RosfinmonitoringStatus rosfinmonitoringStatus,
+            Boolean maritalStatus,
             String passportSeries,
             String passportNumber,
             String passportIssuedBy,
@@ -86,6 +90,7 @@ public class PersonalDataEntity {
     ) {
         this.user = user;
         this.rosfinmonitoringStatus = rosfinmonitoringStatus != null ? rosfinmonitoringStatus : RosfinmonitoringStatus.NOT_RESTRICTED;
+        this.maritalStatus = maritalStatus;
         this.passportSeries = validateAndCleanPassportSeries(passportSeries);
         this.passportNumber = validateAndCleanPassportNumber(passportNumber);
         this.passportIssuedBy = requireNonBlank(passportIssuedBy, "Passport issued by");
@@ -384,5 +389,9 @@ public class PersonalDataEntity {
         return snils;
     }
 
-    public String getPhone() {return phone; }
+    public String getPhone() { return phone; }
+
+    public Boolean getMaritalStatus() { return maritalStatus;}
+
+    public void setMaritalStatus(Boolean maritalStatus) { this.maritalStatus = maritalStatus; }
 }

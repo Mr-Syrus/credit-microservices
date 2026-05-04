@@ -9,6 +9,7 @@ public class RegistrationClientDto {
     private String password;
 
     // PersonalDataEntity
+    private Boolean maritalStatus;
     private String passportSeries;
     private String passportNumber;
     private String passportIssuedBy;
@@ -35,12 +36,56 @@ public class RegistrationClientDto {
     private Integer flat;
     private String registrationType;
 
+    // Constructors
+    public RegistrationClientDto() {}
+
+    public RegistrationClientDto(String username, String mail, String password,
+                                 Boolean maritalStatus,
+                                 String passportSeries, String passportNumber, String passportIssuedBy,
+                                 String departmentCode, LocalDate passportIssueDate,
+                                 String firstName, String lastName, String middleName,
+                                 String gender, LocalDate birthDate, String inn, String snils, String phone,
+                                 LocalDate registrationDate, String postalIndex, String migrationDepartment,
+                                 String region, String district, String city, String street,
+                                 String house, Integer flat, String registrationType) {
+        this.username = username;
+        this.mail = mail;
+        this.password = password;
+        this.maritalStatus = maritalStatus;
+        this.passportSeries = passportSeries;
+        this.passportNumber = passportNumber;
+        this.passportIssuedBy = passportIssuedBy;
+        this.departmentCode = departmentCode;
+        this.passportIssueDate = passportIssueDate;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+        this.gender = gender;
+        this.birthDate = birthDate;
+        this.inn = inn;
+        this.snils = snils;
+        this.phone = phone;
+        this.registrationDate = registrationDate;
+        this.postalIndex = postalIndex;
+        this.migrationDepartment = migrationDepartment;
+        this.region = region;
+        this.district = district;
+        this.city = city;
+        this.street = street;
+        this.house = house;
+        this.flat = flat;
+        this.registrationType = registrationType;
+    }
+
+    // Getters and setters
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
     public String getMail() { return mail; }
     public void setMail(String mail) { this.mail = mail; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+    public Boolean getMaritalStatus() { return maritalStatus; }
+    public void setMaritalStatus(Boolean maritalStatus) { this.maritalStatus = maritalStatus; }
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
     public String getPassportSeries() { return passportSeries; }

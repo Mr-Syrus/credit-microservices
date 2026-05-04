@@ -98,26 +98,4 @@ public class EmployeeService {
 
         codeRepository.delete(authCode);
     }
-
-    @Transactional
-    public List<ApplicationResponseDto> getApplicationsByPassport(String passportSeries, String passportNumber) {
-        List<ApplicationEntity> applications = applicationRepository
-                .findByPassportSeriesAndNumber(passportSeries, passportNumber);
-        if (applications.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "No applications found for given active passport");
-        }
-
-        return applications.stream()
-                .map(app -> new ApplicationResponseDto(
-                      app.getId(),
-                      app.getStatus().name(),
-                      app.getCreditTerm(),
-                      app.getCreditAmount(),
-                      app.getCreatedDateTime(),
-                      app.getCompletionDateTime(),
-                      app.getCredit().getName()
-                )).collect(Collectors.toList());
-
-    }
 }
