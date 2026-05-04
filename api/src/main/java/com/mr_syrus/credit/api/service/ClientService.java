@@ -24,17 +24,13 @@ public class ClientService {
     private final AuthorizationCodeRepository codeRepository;
     private final MailVerificationService mailService;
     private final SimplePasswordEncoder passwordEncoder;
-    private final CreditRepository creditRepository;
-    private final ApplicationRepository applicationRepository;
 
     public ClientService(UserRepository userRepository,
                          PersonalDataRepository personalDataRepository,
                          RegistrationRepository registrationRepository,
                          AuthorizationCodeRepository codeRepository,
                          MailVerificationService mailService,
-                         SimplePasswordEncoder passwordEncoder,
-                         CreditRepository creditRepository,
-                         ApplicationRepository applicationRepository
+                         SimplePasswordEncoder passwordEncoder
                          ) {
         this.userRepository = userRepository;
         this.personalDataRepository = personalDataRepository;
@@ -42,8 +38,6 @@ public class ClientService {
         this.codeRepository = codeRepository;
         this.mailService = mailService;
         this.passwordEncoder = passwordEncoder;
-        this.creditRepository = creditRepository;
-        this.applicationRepository = applicationRepository;
     }
 
     @Transactional

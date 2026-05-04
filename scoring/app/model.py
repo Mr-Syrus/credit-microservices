@@ -20,31 +20,10 @@ def load_model():
     return _model, _scaler
 
 def predict(features: list) -> float:
-    #принимает список [age, income, loan_amount, credit_history]
+    #принимает список
     model, scaler = load_model()
     # Преобразуем в numpy массив и масштабируем
     X = np.array(features).reshape(1, -1)
     X_scaled = scaler.transform(X)
     prob = model.predict_proba(X_scaled)[0, 1]   # вероятность класса "дефолт"
     return float(prob)
-
-# Для демонстрации: если файлов model.pkl/scaler.pkl нет,
-# можно обучить простую модель прямо здесь.
-# Раскомментируйте при необходимости.
-"""
-def train_dummy_model():
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.preprocessing import StandardScaler
-    import numpy as np
-    # Генерация 1000 синтетических клиентов
-    np.random.seed(42)
-    X = np.random.rand(1000, 4)
-    # Простая линейная зависимость: риск выше при большем loan_amount и credit_history
-    y = (X[:, 2] * 0.8 + X[:, 3] * 1.2 > 0.6).astype(int)
-    scaler = StandardScaler().fit(X)
-    model = LogisticRegression().fit(scaler.transform(X), y)
-    with open("model.pkl", "wb") as f: pickle.dump(model, f)
-    with open("scaler.pkl", "wb") as f: pickle.dump(scaler, f)
-    print("Dummy model trained and saved")
-# Вызвать train_dummy_model() если нет готовой модели
-"""

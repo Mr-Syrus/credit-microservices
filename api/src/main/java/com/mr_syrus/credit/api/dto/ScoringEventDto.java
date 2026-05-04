@@ -3,6 +3,7 @@ package com.mr_syrus.credit.api.dto;
 import java.math.BigDecimal;
 
 public class ScoringEventDto {
+    private Integer applicationId;
     private Integer age;
     private BigDecimal monthlyIncome;
     private BigDecimal creditAmount;
@@ -11,14 +12,19 @@ public class ScoringEventDto {
 
     public ScoringEventDto() {}
 
-    public ScoringEventDto(Integer age, BigDecimal monthlyIncome, BigDecimal creditAmount,
+    public ScoringEventDto(Integer applicationId, Integer age, BigDecimal monthlyIncome, BigDecimal creditAmount,
                            Boolean maritalStatus, Integer creditTermMonths) {
+        this.applicationId = applicationId;
         this.age = age;
         this.monthlyIncome = monthlyIncome;
         this.creditAmount = creditAmount;
         this.maritalStatus = maritalStatus;
         this.creditTermMonths = creditTermMonths;
     }
+    public Integer getApplicationId() { return applicationId; }
+
+    public void setApplicationId() { this.applicationId = applicationId; }
+
     public Integer getAge() {
         return age;
     }

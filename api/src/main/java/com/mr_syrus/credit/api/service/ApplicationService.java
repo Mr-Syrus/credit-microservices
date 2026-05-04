@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -26,7 +27,7 @@ public class ApplicationService {
     public ApplicationService(PersonalDataRepository personalDataRepository,
                          CreditRepository creditRepository,
                          ApplicationRepository applicationRepository,
-                         KakaTemplate<String, ScoringEventDto> kafkaTemplate
+                         KafkaTemplate<String, ScoringEventDto> kafkaTemplate
     ) {
         this.personalDataRepository = personalDataRepository;
         this.creditRepository = creditRepository;
@@ -105,9 +106,15 @@ public class ApplicationService {
 
         // 2.5 Создать заявку
         ApplicationEntity application = new ApplicationEntity(personalData, credit, dto.getCreditTermMonths(), dto.getCreditAmount());
+        // 4 Сохранить все
         application = applicationRepository.save(application);
+        sendScoringEvent(eventDto, application.getId());
 
         return application.getId();
+    }
+
+    private void sendScoringEvent(ScoringEventDto event, Integer applicationId) {
+        kafkaTemplate.send("scoring-requests", event); //стоит добавить логирование
     }
 
 

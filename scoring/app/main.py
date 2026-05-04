@@ -1,7 +1,7 @@
 
 # Микросервис кредитного скоринга на FastAPI + Kafka.
 # Коммуникация с Java-микросервисом:
-# - Java отправляет сообщения в Kafka topic "credit.requests"
+# - Java отправляет сообщения в Kafka topic "scoring-requests"
 # - Python читает, вычисляет вероятность дефолта, отправляет ответ в "credit.responses"
 
 import asyncio
@@ -15,11 +15,10 @@ from .model import predict
 # Конфигурация Kafka
 import os
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "localhost:9092")
-REQUEST_TOPIC = "credit.requests"
+REQUEST_TOPIC = "scoring-requests"
 RESPONSE_TOPIC = "credit.responses"
 GROUP_ID = "python-scoring-group"
 
-# Глобальные объекты consumer/producer
 consumer = None
 producer = None
 
@@ -61,7 +60,7 @@ async def kafka_loop():
             # Валидация входных данных
             try:
                 req = ScoreRequest(**request_data)
-                prob = predict([req.age, req.income, req.loan_amount, req.credit_history])
+                prob = predict([req.applicationId, req.age, req.monthlyIncome, req.creditAmount, req.maritalStatus, req.creditTermMonths])
                 decision = "approve" if prob < 0.5 else "reject"
                 response = ScoreResponse(
                     request_id=request_id,
@@ -86,7 +85,7 @@ async def kafka_loop():
 app = FastAPI(
     title="Credit Scoring Microservice",
     description="Predicts default probability using logistic regression. "
-                "Listens to Kafka topic 'credit.requests' and sends responses to 'credit.responses'. "
+                "Listens to Kafka topic 'scoring-requests' and sends responses to 'credit.responses'. "
                 "Also provides REST endpoint /score for testing.",
     version="1.0",
     lifespan=lifespan
