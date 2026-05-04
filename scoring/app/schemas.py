@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 class ScoreRequest(BaseModel):
+    applicationId: int
     age: int
     monthlyIncome: float
     creditAmount: float
@@ -9,7 +10,7 @@ class ScoreRequest(BaseModel):
     creditTermMonths: int
 
 class ScoreResponse(BaseModel):
-    request_id: Optional[str] = None
+    applicationId: int
     probability: float
     decision: str
     error: Optional[str] = None

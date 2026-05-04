@@ -17,8 +17,8 @@ n_samples = 10000
 age = np.random.randint(18, 70, n_samples) # возраст
 income = np.random.randint(300, 3000, n_samples) # доход в тыс. руб
 loan_amount = np.random.randint(50, 500, n_samples) # сумма кредита в тыс. руб
-credit_term_months = np.random.randint(6, 60, n_samples) # срок кредита в месяцах
 marital_status = np.random.choice([0, 1], n_samples, p=[0.4, 0.6]) # состоит в браке
+credit_term_months = np.random.randint(6, 60, n_samples)  # срок кредита в месяцах
 
 X = np.column_stack((age, income, loan_amount, marital_status))
 
@@ -66,7 +66,7 @@ print("\nClassification report:")
 print(classification_report(y_test, y_pred, target_names=['returned', 'default']))
 
 # интерпретация коэффициентов (важность признаков)
-feature_names = ['age', 'income', 'loan_amount', 'credit_history']
+feature_names = ['age', 'income', 'loan_amount', 'marital_status', 'credit_term_months']
 coefficients = model.coef_[0]
 print("\nКоэффициенты модели (влияние на логарифм шансов дефолта):")
 for name, coef in zip(feature_names, coefficients):

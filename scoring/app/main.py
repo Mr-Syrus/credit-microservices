@@ -56,28 +56,34 @@ async def kafka_loop():
     try:
         async for msg in consumer:
             request_data = msg.value
-            request_id = request_data.get("request_id")
+            app_id = request_data.get("applicationId")
             # Валидация входных данных
             try:
                 req = ScoreRequest(**request_data)
-                prob = predict([req.applicationId, req.age, req.monthlyIncome, req.creditAmount, req.maritalStatus, req.creditTermMonths])
+                features = [
+                    req.age,
+                    req.monthlyIncome,
+                    req.creditAmount,
+                    1 if req.maritalStatus else 0,
+                    req.creditTermMonths
+                ]
+                prob = predict(features)
                 decision = "approve" if prob < 0.5 else "reject"
                 response = ScoreResponse(
-                    request_id=request_id,
-                    probability=prob,
+                    applicationId=app_id,
+                    probability=round(prob, 4),
                     decision=decision
                 )
             except Exception as e:
-                # В случае ошибки отправляем ответ с ошибкой
                 response = ScoreResponse(
-                    request_id=request_id,
+                    applicationId=app_id,
                     probability=0.0,
                     decision="error",
                     error=str(e)
                 )
             # Отправка ответа в топик
             await producer.send(RESPONSE_TOPIC, value=response.dict())
-            print(f"Processed {request_id} -> {decision} (prob={response.probability:.3f})")
+            print(f"Processed {app_id} -> {response.decision} (prob={response.probability:.3f})")
     except Exception as e:
         print(f"Kafka loop error: {e}")
 
@@ -99,13 +105,21 @@ async def health_check():
 async def score_sync(request: ScoreRequest):
     #эндпоинт для тестов
     try:
-        prob = predict([request.age, request.income, request.loan_amount, request.credit_history])
+        features = [
+                    request.age, 
+                    request.monthlyIncome, 
+                    request.creditAmount, 
+                    1 if request.maritalStatus else 0, 
+                    request.creditTermMonths
+                    ]
+        prob = predict(features)
         decision = "approve" if prob < 0.5 else "reject"
-        return ScoreResponse(
-            request_id=request.request_id,
-            probability=prob,
-            decision=decision
-        )
+        response = ScoreResponse(
+                    applicationId=response.applicationId,
+                    probability=round(prob, 4),
+                    decision=decision
+                )
+    
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
