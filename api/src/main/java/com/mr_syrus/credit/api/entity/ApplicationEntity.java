@@ -20,7 +20,7 @@ public class ApplicationEntity {
     private PersonalDataEntity personalData;
 
     @OneToOne(mappedBy = "application", cascade = CascadeType.PERSIST)
-    private ScoringEntity scoring;
+    private ScoringResultEntity scoring;
 
     @ManyToOne
     @JoinColumn(name = "credit_id", nullable = false)
@@ -91,7 +91,7 @@ public class ApplicationEntity {
         return personalData;
     }
 
-    public ScoringEntity getScoring() {
+    public ScoringResultEntity getScoring() {
         return scoring;
     }
 
@@ -133,7 +133,7 @@ public class ApplicationEntity {
         }
     }
 
-    public void setScoring(ScoringEntity scoring) {
+    public void setScoring(ScoringResultEntity scoring) {
         if (scoring == null) {
             throw new IllegalArgumentException("Scoring cannot be null");
         }

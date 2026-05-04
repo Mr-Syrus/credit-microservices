@@ -95,26 +95,26 @@ public class ApplicationService {
             throw new IllegalArgumentException("Credit term out of allowed range");
         }
 
-        // 2.4 Собрать дто для скоринга
+        // 3.1 Создать заявку
+        ApplicationEntity application = new ApplicationEntity(personalData, credit, dto.getCreditTermMonths(), dto.getCreditAmount());
+        application = applicationRepository.save(application);
+
+        // 3.2 Собрать дто для скоринга
         int age = Period.between(dto.getBirthDate(), LocalDate.now()).getYears();
         ScoringEventDto eventDto = new ScoringEventDto(
+                application.getId(),
                 age,
                 dto.getMonthlyIncome(),
                 dto.getCreditAmount(),
                 dto.getMaritalStatus(),
                 dto.getCreditTermMonths());
-
-        // 2.5 Создать заявку
-        ApplicationEntity application = new ApplicationEntity(personalData, credit, dto.getCreditTermMonths(), dto.getCreditAmount());
-        // 4 Сохранить все
-        application = applicationRepository.save(application);
-        sendScoringEvent(eventDto, application.getId());
+        sendScoringEvent(eventDto);
 
         return application.getId();
     }
 
-    private void sendScoringEvent(ScoringEventDto event, Integer applicationId) {
-        kafkaTemplate.send("scoring-requests", event); //стоит добавить логирование
+    private void sendScoringEvent(ScoringEventDto eventDto) {
+        kafkaTemplate.send("scoring-requests", eventDto); //стоит добавить логирование
     }
 
 
