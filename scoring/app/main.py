@@ -96,7 +96,7 @@ app = FastAPI(
     version="1.0",
     lifespan=lifespan
 )
-
+#эндпоинт для проверки состояния kafka
 @app.get("/health")
 async def health_check():
     return {"status": "alive", "kafka_connected": consumer is not None and not consumer._closed}
@@ -115,7 +115,7 @@ async def score_sync(request: ScoreRequest):
         prob = predict(features)
         decision = "approve" if prob < 0.5 else "reject"
         response = ScoreResponse(
-                    applicationId=response.applicationId,
+                    applicationId=request.applicationId,
                     probability=round(prob, 4),
                     decision=decision
                 )

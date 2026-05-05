@@ -18,15 +18,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/client")
 public class ClientController {
-    private final ApplicationService applicationService;
     private final ClientService clientService;
-    private final SessionService sessionService;
 
-    public ClientController(ApplicationService applicationService, ClientService clientService, SessionService sessionService) {
-        this.applicationService = applicationService;
-
+    public ClientController(ClientService clientService) {
         this.clientService = clientService;
-        this.sessionService = sessionService;
     }
 
     @PostMapping("/register")
@@ -39,24 +34,5 @@ public class ClientController {
     public ResponseEntity<String> confirmRegistration(@RequestBody CodeVerificationDto dto) {
         clientService.confirmRegistration(dto);
         return ResponseEntity.ok("Registration confirmed successfully");
-    }
-
-    @PostMapping("/create_application")
-    public ResponseEntity<Integer> createApplication(@RequestBody CreateApplicationDto dto,
-                                                  HttpServletRequest request) {
-        String sessionKey = extractSessionKey(request);
-        UserEntity currentUser = sessionService.getUserBySessionKey(sessionKey);
-        Integer applicationId = applicationService.createApplication(dto, currentUser);
-        return ResponseEntity.ok(applicationId);
-    }
-
-    private String extractSessionKey(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) throw new IllegalArgumentException("No session cookie");
-        return Arrays.stream(cookies)
-                .filter(c -> "session".equals(c.getName()))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No active session"));
     }
 }
