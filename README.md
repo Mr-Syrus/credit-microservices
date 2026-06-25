@@ -1,33 +1,35 @@
-# credit-microservices - микросервисный бекенд с моделью кредитного скоринга на базе логистической регрессии
+# credit-microservices - Microservice Backend with Credit Scoring Model Based on Logistic Regression
 
-Проект представляет собой систему для обработки кредитных заявок с асинхронным скорингом через Apache Kafka.  
-Состоит из двух микросервисов:
+The project is a system for processing credit applications with asynchronous scoring via Apache Kafka.  
+It consists of two microservices:
 
-- **Java (Spring Boot)** – управление пользователями, создание заявок, отправка событий в Kafka, получение результатов скоринга.
-- **Python (FastAPI + aiokafka)** – обучение модели кредитного скоринга (логистическая регрессия), предсказание вероятности дефолта, обработка сообщений из Kafka.
+- **Java (Spring Boot)** – user management, application creation, sending events to Kafka, receiving scoring results.
+- **Python (FastAPI + aiokafka)** – credit scoring model training (logistic regression), default probability prediction, processing messages from Kafka.
 
-## Архитектура
+## Architecture
 
-1. Пользователь (клиент) создаёт заявку через REST API Java-сервиса.
-2. Java сохраняет заявку в БД и отправляет событие в топик Kafka `scoring-requests`.
-3. Python-микросервис читает топик, вычисляет вероятность дефолта (на основе возраста, дохода, суммы, семейного положения, срока кредита) и отправляет результат в топик `credit.responses`.
-4. Java-консюмер получает результат, сохраняет его в таблицу `scoringEntity` и обновляет статус заявки в `applicationEntity` (APPROVED / REJECTED).
+1. The user (client) creates an application via the REST API of the Java service.
+2. Java saves the application to the database and sends an event to the Kafka topic `scoring-requests`.
+3. The Python microservice reads the topic, calculates the default probability (based on age, income, amount, marital status, loan term), and sends the result to the `credit.responses` topic.
+4. The Java consumer receives the result, saves it to the `scoringEntity` table, and updates the application status in `applicationEntity` (APPROVED / REJECTED).
 
-## Требования
+## Requirements
 
-- **Docker** и **Docker Compose** (для Kafka)
-- **Java 17+** и Gradle
-- **Python 3.14+** (рекомендуется использовать виртуальное окружение)
-- **PostgreSQL** (для хранения данных Java-сервиса) – можно также поднять через Docker
+- **Docker** and **Docker Compose** (for Kafka)
+- **Java 17+** and Gradle
+- **Python 3.14+** (using a virtual environment is recommended)
+- **PostgreSQL** (for Java service data storage) – can also be run via Docker
 
-## Запуск инфраструктуры
-1. Инициализация зависимостей для обоих сервисов и создание виртуального окружения
-2. Обучение модели `credit-microservices/scoring/train_model.py`
-3. Запуск бд
-4. Запуск `kafka` (docker-compose) 
-5. Запуск микросервиса `scoring`
-6. запуск микросервиса `api`
+## Infrastructure Setup
 
-## Для тестов
-- Для Java‑микросервиса (`api`) доступна документация Swagger
-- ля Python‑микросервиса (`scoring`) предусмотрен отдельный эндпоинт `/health`, который позволяет убедиться, что сервис запущен и подключён к Kafka
+1. Initialize dependencies for both services and create a virtual environment.
+2. Train the model: `credit-microservices/scoring/train_model.py`
+3. Start the database.
+4. Start `Kafka` (docker-compose).
+5. Start the `scoring` microservice.
+6. Start the `api` microservice.
+
+## Testing
+
+- For the Java microservice (`api`), Swagger documentation is available.
+- For the Python microservice (`scoring`), a separate `/health` endpoint is provided, which allows you to verify that the service is running and connected to Kafka.
